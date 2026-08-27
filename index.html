@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Khám Phá Việt Nam Cùng Capy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Charm:wght@400;700&family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Courier New", Georgia, "Times New Roman", cursive, serif; 
+            font-weight: bold; 
+            margin: 0;
+            padding: 0;
+        }
+
+        body { 
+            overflow: hidden; 
+            background-color: #000000; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000000; 
+            overflow: hidden;
+        }
+
+        .video-screen {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; 
+            height: 100%;
+            object-fit: contain; 
+            background-color: #000000; 
+            z-index: 5; 
+            display: none; 
+        }
+
+        /* 🌅 MÀN HÌNH CHỜ BAN ĐẦU */
+        #start-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000000;
+        }
+
+        #start-overlay-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('poster.png');
+            background-size: contain; 
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: brightness(0.7); 
+            z-index: 0;
+        }
+
+        #btn-start-game {
+            position: relative;
+            z-index: 12;
+            padding: 15px 35px;
+            font-size: min(24px, 4.5vw);
+            color: #fffdf0;
+            background: #916611;
+            border: 4px double #fffdf0;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        #btn-start-game:hover { transform: scale(1.05); background: #73500a; }
+
+        /* 📜 KHUNG TỜ GIẤY CỔ RÁCH MÉP SẦN SÙI */
+        .ancient-parchment {
+            background-color: #e6cc9e;
+            background-image: 
+                radial-gradient(circle at 30% 20%, #d4b479 0%, transparent 40%),
+                radial-gradient(circle at 75% 60%, #c4a164 0%, transparent 35%),
+                radial-gradient(rgba(0,0,0,0.04) 1px, transparent 0);
+            background-size: 100% 100%, 100% 100%, 6px 6px;
+            clip-path: polygon(
+                0% 2%, 4% 0%, 9% 3%, 15% 1%, 22% 4%, 28% 1%, 35% 3%, 42% 0%, 50% 3%, 58% 1%, 66% 4%, 73% 2%, 81% 4%, 88% 1%, 95% 3%, 100% 0%,
+                98% 8%, 100% 15%, 97% 23%, 99% 32%, 98% 41%, 100% 50%, 97% 58%, 99% 67%, 98% 76%, 100% 84%, 97% 91%, 99% 96%, 100% 100%,
+                94% 97%, 87% 99%, 80% 96%, 72% 98%, 65% 96%, 57% 99%, 49% 97%, 41% 99%, 33% 96%, 26% 98%, 19% 96%, 12% 99%, 5% 97%, 0% 100%,
+                2% 93%, 0% 85%, 3% 77%, 1% 69%, 3% 60%, 1% 51%, 2% 43%, 0% 34%, 3% 26%, 1% 17%, 2% 9%
+            );
+            filter: drop-shadow(0px 12px 24px rgba(0,0,0,0.6));
+        }
+
+        /* 🪵 BONG BÓNG CHAT BẢNG GỖ HOÀNG CUNG CỔ TRANG CHẶNG HUẾ & HỘI AN */
+        .ancient-wooden-board {
+            background-color: #4a2f1b;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.3) 50%, transparent 50%),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.15)),
+                repeating-linear-gradient(180deg, #4a2f1b 0px, #3d2514 10px, #573820 20px);
+            background-size: 100% 6px, 100% 100%, 100% 40px;
+            border: 8px solid #2b1a0e;
+            outline: 3px double #d4af37;
+            outline-offset: -6px;
+            border-radius: 6px;
+            color: #f7dfb3;
+            text-shadow: 2px 2px 3px #000000, 0 0 4px rgba(212, 175, 55, 0.4);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.8), 0 0 0 2px #1c1008;
+            position: relative;
+        }
+        .ancient-wooden-board::before, .ancient-wooden-board::after {
+            content: "•"; position: absolute; top: 50%; transform: translateY(-50%); font-size: 24px; color: #b8860b; text-shadow: 0 1px 2px #000;
+        }
+        .ancient-wooden-board::before { left: 10px; }
+        .ancient-wooden-board::after { right: 10px; }
+
+        #capy-speech-bubble {
+            position: absolute; bottom: 3%; left: 50%; transform: translateX(-50%); width: 90%; max-width: 1000px; padding: 15px 30px; z-index: 8; display: none; font-size: min(16px, 3.5vw); line-height: 1.4; color: #120700; text-align: center; max-height: 30%; overflow-y: auto;
+        }
+        #capy-speech-bubble strong { color: #7a1400; font-size: min(18px, 4vw); letter-spacing: 1px; }
+
+        /* 📜 SẮC CHỈ KHOA CỰ BAN ĐẦU */
+        #intro-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; display: none; background: linear-gradient(135deg, #170d03, #2e1a05); justify-content: center; align-items: center; padding: 20px;
+        }
+        .intro-card { width: 90%; max-width: 750px; padding: 25px 35px; text-align: center; max-height: 90%; overflow-y: auto; }
+        .intro-title { font-size: min(34px, 6vw); color: #5e1100; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; font-family: 'Charm', cursive, serif; font-weight: 900; }
+        .intro-content { font-size: min(22px, 4vw); line-height: 1.5; color: #241100; text-align: justify; margin-bottom: 20px; font-family: 'Charm', cursive, serif; font-weight: 700; }
+        #btn-start-quiz { background: linear-gradient(to bottom, #916611, #6e4c0a); color: #fffdf0; border: 2px solid #5e1100; padding: 10px 30px; font-size: min(20px, 4.5vw); border-radius: 4px; cursor: pointer; text-transform: uppercase; font-family: 'Charm', cursive, serif; font-weight: 900; }
+
+        /* 🖋️ KHÔNG GIAN TRƯỜNG THI TRẮC NGHIỆM */
+        #quiz-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 12; display: none; 
+            background-image: url('image_545861.jpg'); background-size: contain; background-position: center; background-repeat: no-repeat; background-color: #000000; 
+        }
+        #quiz-wrapper { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; max-width: 1100px; aspect-ratio: 16 / 9; }
+        #question-box { position: absolute; top: 12.5%; left: 14.5%; width: 71.5%; height: 26%; display: flex; align-items: center; justify-content: center; padding: 5px 15px; font-size: min(26px, 2.8vw); color: #100801; text-align: center; line-height: 1.35; overflow-y: auto; font-weight: 900; font-family: 'Charm', cursive, serif; }
+        #options-container { position: absolute; top: 43%; left: 14.5%; width: 71.5%; display: flex; flex-direction: column; gap: 1%; max-height: 40%; overflow-y: auto; }
+        .option-btn { background: transparent; border: none; padding: 4px 10px; font-size: min(22px, 2.4vw); color: #23160a; cursor: pointer; text-align: left; transition: color 0.15s ease, transform 0.1s ease; line-height: 1.3; font-weight: 900; font-family: 'Charm', cursive, serif; white-space: normal; }
+        .option-btn:hover { color: #5e1100; transform: translateX(6px); }
+        #quiz-progress { position: absolute; top: 4%; left: 50%; transform: translateX(-50%); background: #5e1100; border: 2px solid #916611; color: #fffdf0; padding: 4px 15px; font-size: min(14px, 2vw); border-radius: 4px; }
+        #quiz-rule-note { position: absolute; bottom: 15.5%; left: 14.5%; font-size: min(20px, 2.2vw); color: #3b241e; pointer-events: none; z-index: 20; text-shadow: 0.5px 0.5px 0px rgba(255,255,255,0.8); font-weight: 900; font-family: 'Charm', cursive, serif; }
+
+        /* 📜 BẢNG VÀNG KHOA THI HỘI */
+        .result-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 30; display: none; justify-content: center; align-items: center; background-color: rgba(0, 0, 0, 0.85); padding: 15px; }
+        .royal-vertical-scroll { position: relative; width: 90%; max-width: 480px; height: 90%; background: #f7e0b5; background-image: linear-gradient(to right, rgba(0,0,0,0.08), transparent 8%, transparent 92%, rgba(0,0,0,0.08)), radial-gradient(rgba(0,0,0,0.015) 1px, transparent 0); background-size: 100% 100%, 6px 6px; border-left: 6px solid #b8860b; border-right: 6px solid #b8860b; padding: 30px 25px; text-align: center; box-shadow: 0 30px 70px rgba(0,0,0,0.4); display: flex; flex-direction: column; justify-content: space-between; animation: unfoldVertical 0.7s ease-out forwards; overflow-y: auto; }
+        .royal-vertical-scroll::before, .royal-vertical-scroll::after { content: ""; position: absolute; left: -15px; width: calc(100% + 30px); height: 16px; background: linear-gradient(to bottom, #8a640f, #dbab35, #614505); border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .royal-vertical-scroll::before { top: -8px; }
+        .royal-vertical-scroll::after { bottom: -8px; }
+        @keyframes unfoldVertical { from { transform: scaleY(0.1); opacity: 0; } to { transform: scaleY(1); opacity: 1; } }
+        .scroll-header { font-size: min(28px, 5vw); color: #7a1400; text-transform: uppercase; margin-bottom: 10px; border-bottom: 2px dashed #7a1400; padding-bottom: 5px; font-weight: 900; font-family: 'Charm', cursive, serif; }
+        .scroll-body { font-size: min(22px, 4vw); line-height: 1.4; color: #2e1700; font-weight: 900; font-family: 'Charm', cursive, serif; }
+        .scroll-gold-board { background: rgba(255, 255, 255, 0.4); border: 3px double #7a1400; padding: 15px 10px; margin: 15px 0; box-shadow: inset 0 0 20px rgba(122,20,0,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; }
+        .scroll-gold-title { font-size: min(28px, 4.5vw); color: #7a1400; letter-spacing: 1px; font-weight: 900; font-family: 'Charm', cursive, serif; }
+        .scroll-gold-name { display: block; font-size: min(64px, 10vw); color: #d63600; font-weight: 900; text-transform: uppercase; margin-top: 5px; letter-spacing: 4px; text-shadow: 2px 2px 5px rgba(0,0,0,0.25); font-family: 'Charm', cursive, serif; }
+        .btn-scroll-action { width: 100%; padding: 10px 0; font-size: min(20px, 4.5vw); border-radius: 4px; cursor: pointer; text-transform: uppercase; border: 2px solid #7a1400; letter-spacing: 1px; font-family: 'Charm', cursive, serif; font-weight: 900; }
+        .scroll-pass-btn { background: linear-gradient(to bottom, #916611, #6e4c0a); color: #fffdf0; }
+        .scroll-fail-btn { background: #d4c4a3; color: #2e1700; border-color: #5c4731; font-family: 'Charm', cursive, serif; }
+
+        /* 🪘 CHẶNG TRỐNG TRẬN */
+        #morse-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 15; display: none; background-image: url('screenshot_2026.jpg'); background-size: contain; background-position: center; background-repeat: no-repeat; background-color: #000000; }
+        .morse-panel { position: absolute; bottom: 3%; left: 50%; transform: translateX(-50%); width: 90%; max-width: 850px; padding: 15px 25px; text-align: center; max-height: 45%; overflow-y: auto; }
+        .morse-instruction { font-size: min(14px, 3vw); color: #fffdf0; margin-bottom: 8px; background: #5e1100; padding: 4px 10px; border-radius: 4px; display: inline-block; }
+        .morse-dialogue { font-size: min(17px, 3.5vw); color: #210d00; margin-bottom: 12px; min-height: 35px; line-height: 1.4; font-weight: 800; }
+        .morse-input-container { display: flex; gap: 10px; justify-content: center; margin-bottom: 8px; flex-wrap: wrap; }
+        .morse-input-box { width: 60%; min-width: 200px; padding: 8px; font-size: min(16px, 3.5vw); border: 2px dashed #5e1100; border-radius: 4px; background: rgba(255, 253, 245, 0.7); text-transform: uppercase; text-align: center; outline: none; color: #5e1100; font-weight: bold; }
+        .btn-morse { padding: 8px 18px; font-size: min(14px, 3vw); text-transform: uppercase; color: #fffdf0; border: 2px solid #916611; border-radius: 4px; cursor: pointer; }
+        .btn-morse-play { background: #7a5014; }
+        .btn-morse-submit { background: #5e1100; }
+        #policy-container { display: none; flex-direction: column; gap: 6px; width: 100%; max-width: 500px; margin: 0 auto; }
+        .btn-policy-option { background: rgba(255, 253, 245, 0.85); border: 2px solid #5e1100; border-radius: 6px; padding: 8px 15px; font-size: min(20px, 4vw); text-align: left; cursor: pointer; color: #210d00; transition: all 0.2s; font-weight: 900; font-family: 'Charm', cursive, serif; }
+        .btn-policy-option:hover { background: #5e1100; color: #fffdf0; transform: translateX(5px); }
+
+        /* ⚡ MÀN HÌNH HIỆU ỨNG NẠP NĂNG LƯỢNG */
+        #energy-loading-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 60; display: none; background: #0b0200; color: #00ffcc; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; font-family: 'Courier New', monospace; overflow-y: auto; }
+        .energy-title { font-size: min(24px, 5vw); letter-spacing: 2px; text-shadow: 0 0 10px #00ffcc; margin-bottom: 15px; color: #fff; }
+        .energy-bar-container { width: 80%; max-width: 450px; height: 22px; border: 2px solid #00ffcc; padding: 2px; border-radius: 4px; box-shadow: 0 0 15px rgba(0,255,204,0.3); margin-bottom: 15px; }
+        .energy-bar-fill { width: 0%; height: 100%; background: #00ffcc; box-shadow: 0 0 10px #00ffcc; transition: width 0.1s linear; }
+        .energy-status-text { font-size: min(16px, 3.5vw); color: #00ffcc; min-height: 22px; margin-bottom: 15px; }
+        .energy-route-box { background: rgba(255,255,255,0.05); border: 1px dashed #00ffcc; padding: 15px; border-radius: 6px; max-width: 550px; line-height: 1.5; font-size: min(16px, 3.5vw); color: #fffdf0; opacity: 0; transform: translateY(10px); transition: all 0.5s ease; }
+        .energy-route-box.show { opacity: 1; transform: translateY(0); }
+        .btn-energy-continue { margin-top: 15px; padding: 8px 25px; font-size: 15px; background: #00ffcc; color: #0b0200; border: none; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-weight: bold; display: none; box-shadow: 0 0 15px #00ffcc; }
+
+        /* 🔒 POP-UP HUY HIỆU */
+        #badge-popup-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 70; display: none; flex-direction: column; justify-content: space-between; align-items: center; background-color: #000000; padding: 15px; }
+        .badge-image-container { flex: 1; display: flex; justify-content: center; align-items: center; width: 100%; overflow: hidden; }
+        #badge-display-img { max-width: 95%; max-height: 70vh; object-fit: contain; border: 3px solid #ffeb3b; border-radius: 8px; box-shadow: 0 0 25px rgba(255,235,59,0.3); display: none; }
+        .badge-control-panel { width: 90%; max-width: 380px; display: flex; flex-direction: column; gap: 8px; margin-bottom: 5px; z-index: 100; }
+        .btn-badge-download { width: 100%; padding: 11px 0; font-size: 15px; background: linear-gradient(to bottom, #916611, #6e4c0a); color: #fffdf0; border: 2px solid #5e1100; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
+        .btn-badge-close { width: 100%; padding: 9px 0; font-size: 13px; background: #d4c4a3; color: #2e1700; border: 1px solid #5c4731; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
+
+        /* 🏯 CHẶNG HUẾ */
+        #hue-accident-screen, #hue-mixer-screen { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 20; display: none; background-color: #000000; justify-content: center; align-items: center; }
+        #hue-accident-wrapper, #hue-mixer-wrapper { position: relative; width: 100%; height: 100%; }
+        .hue-bg-image { width: 100vw; height: 100vh; object-fit: cover; background-color: #000000; }
+        .hue-wooden-bubble { position: absolute; bottom: 4%; left: 50%; transform: translateX(-50%); width: 92%; max-width: 950px; padding: 15px 40px; font-size: min(15px, 3.2vw); line-height: 1.45; text-align: justify; display: flex; flex-direction: column; gap: 6px; align-items: center; max-height: 35%; overflow-y: auto; z-index: 22; }
+        .btn-hue-next-step { margin-top: 4px; padding: 5px 20px; font-size: min(14px, 3vw); background: linear-gradient(to bottom, #d47a22, #914c05); color: #fffdf0; border: 1px solid #ffe6c4; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* 🏮 CHẶNG HỘI AN */
+        #hoian-lantern-screen { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 50; display: none; background-color: #000000; justify-content: center; align-items: center; }
+        #hoian-lantern-wrapper { position: relative; width: 100%; height: 100%; }
+        .hoian-wooden-bubble { position: absolute; bottom: 4%; left: 50%; transform: translateX(-50%); width: 92%; max-width: 950px; padding: 15px 40px; font-size: min(15px, 3.2vw); line-height: 1.45; text-align: justify; display: flex; flex-direction: column; gap: 8px; align-items: center; max-height: 35%; overflow-y: auto; z-index: 52; }
+
+        /* 🎛️ BÀN ĐIỀU CHỈNH MIXER ÂM THANH */
+        #mixer-console { position: absolute; top: 40%; left: 50%; transform: translateX(-50%); width: 85%; max-width: 850px; height: 50%; display: flex; justify-content: space-around; align-items: center; background: rgba(43, 26, 14, 0.85); border: 4px double #d4af37; border-radius: 8px; padding: 10px 20px; box-shadow: inset 0 0 20px #000; }
+        .mixer-track { display: flex; flex-direction: column; align-items: center; width: 28%; height: 100%; justify-content: space-between; }
+        .mixer-track label { color: #f7dfb3; font-size: min(14px, 2.4vw); margin-bottom: 5px; text-shadow: 1px 1px 2px #000; text-align: center; }
+        .slider-vertical { -webkit-appearance: none; appearance: none; width: 12px; height: 55%; background: #1a0f08; border-left: 2px solid #573820; border-right: 2px solid #573820; outline: none; border-radius: 4px; writing-mode: bt-lr; -webkit-appearance: slider-vertical; }
+        .slider-vertical::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 32px; height: 20px; background: linear-gradient(#d4af37, #8a640f); border: 2px solid #ffe6c4; border-radius: 3px; cursor: pointer; box-shadow: 0 2px 5px #000; }
+        .slider-target-box { font-size: min(11px, 1.8vw); color: #ffeb3b; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 3px; border: 1px dashed #d4af37; margin-top: 4px; }
+        #mixer-success-alert { position: absolute; top: 12%; left: 50%; transform: translateX(-50%); width: 85%; max-width: 850px; padding: 15px 40px; text-align: justify; font-size: min(15px, 3.2vw); display: none; z-index: 30; }
+
+        /* 📜 MÀN HÌNH ĐỌC CHIẾU THƯ & KẾT QUẢ ĐÔNG A BAN ĐẦU */
+        #morse-decree-screen, #morse-victory-screen {
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 45; display: none; background-color: #000; justify-content: center; align-items: center;
+        }
+        .morse-wooden-bubble {
+            position: absolute; bottom: 4%; left: 50%; transform: translateX(-50%);
+            width: 92%; max-width: 950px; padding: 15px 40px;
+            display: flex; flex-direction: column; gap: 8px; align-items: center; z-index: 50;
+        }
+        #morse-decree-screen .morse-wooden-bubble {
+            position: absolute;
+            top: 5%; 
+            bottom: auto; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 85%;
+            max-width: 800px;
+            padding: 15px 35px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.85), inset 0 0 25px rgba(0,0,0,0.7);
+        }
+        .key-input-container { display: flex; gap: 10px; margin-top: 5px; width: 100%; justify-content: center; }
+        .key-input-box { padding: 6px 15px; font-size: 15px; border: 2px solid #d4af37; border-radius: 4px; background: #2b1a0e; color: #fff; text-transform: uppercase; text-align: center; outline: none; }
+
+        /* NÚT ĐIỀU HƯỚNG CHUNG */
+        .btn-nav-skip { position: absolute; top: 15px; right: 15px; z-index: 100; padding: 8px 18px; font-size: 13px; color: #fffdf0; background: rgba(94, 17, 0, 0.85); border: 2px solid #916611; border-radius: 4px; cursor: pointer; text-transform: uppercase; display: none; }
+        .btn-nav-back { position: absolute; top: 15px; left: 15px; z-index: 100; padding: 8px 18px; font-size: 13px; color: #fffdf0; background: rgba(33, 13, 0, 0.92); border: 2px solid #916611; border-radius: 4px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: none; }
+
+        #orientation-warning { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #5e1100; color: white; z-index: 9999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+        .phone-icon { width: 50px; height: 85px; border: 4px solid white; border-radius: 10px; margin-bottom: 20px; animation: rotatePhone 2s ease-in-out infinite; }
+        @keyframes rotatePhone { 0% { transform: rotate(0deg); } 50% { transform: rotate(-90deg); } 100% { transform: rotate(-90deg); } }
+
+        @media screen and (orientation: portrait) { #orientation-warning { display: flex; } #game-container { display: none; } }
+       
+        #food-stage-screen .ancient-wooden-board{
+            position: absolute;
+            width: 290px !important;
+            height: 535px;
+            top: 18px !important;
+            right: 18px !important;
+            max-width: none !important;
+            padding: 24px 22px !important;
+            font-size: 13px !important;
+            line-height: 1.7 !important;
+            overflow-y: auto;
+            z-index: 500;
+        }
+
+        #food-stage-screen .ancient-wooden-board strong{
+            display: block;
+            color: #ffd86b;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+       .game-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000000;
+            z-index: 9999; 
+        }
+
+        .food-image {
+            width: 100vw;
+            height: 100vh;
+            object-fit: fill; 
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1; 
+        }
+
+        .click-area {
+            position: absolute;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        #btn-start-food{
+            position: absolute;
+            left: 50%;
+            bottom: 40px;
+            transform: translateX(-50%);
+            padding: 14px 32px;
+            font-size: 20px;
+            font-weight: bold;
+            background: #8b5a2b;
+            color: white;
+            border: 3px solid #d6a13a;
+            border-radius: 12px;
+            cursor: pointer;
+            z-index: 999;
+        }
+        #food-stage-screen .btn-nav-back,
+        #food-stage-screen .btn-nav-skip,
+        .game-screen .btn-nav-back {
+            display: none !important;
+        }
+        .btn-opt {
+            background: #2b1a0e;
+            color: #f7dfb3;
+            border: 2px solid #8a640f;
+            border-radius: 5px;
+            padding: 8px 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .btn-opt:hover, .btn-opt.active {
+            background: #d4af37;
+            color: #1a0f08;
+            font-weight: bold;
+            border-color: #fffdf0;
+            box-shadow: 0 0 8px #d4af37;
+        }
+
+        /* Hiệu ứng bay lên bầu trời đêm */
+        @keyframes flyUpToSky {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-120px) scale(0.85); }
+            100% { transform: translateY(-280px) scale(0.6); }
+        }
+        .lantern-flying {
+            animation: flyUpToSky 4s ease-in-out forwards;
+        }
+        .lantern-click-btn {
+            position: absolute;
+            cursor: pointer;
+            background: transparent;
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: all 0.15s ease-in-out;
+        }
+
+        /* Hiệu ứng viền vàng ôm sát khung chữ khi Hover */
+        .lantern-click-btn:hover {
+            background: rgba(255, 235, 59, 0.25);
+            border: 2px solid #ffeb3b;
+            box-shadow: 0 0 10px rgba(255, 235, 59, 0.7);
+        }
+
+        /* Hiệu ứng khi ô chữ đang được chọn thành công */
+        .lantern-click-btn.selected-opt {
+            background: rgba(0, 255, 204, 0.3);
+            border: 2px solid #00ffcc !important;
+            box-shadow: 0 0 12px #00ffcc;
+        }
+        /* Đảm bảo vùng chọn (container chứa cả chữ và ảnh mẫu) căn giữa và nhạy sự kiện */
+        .lantern-option-item, .choice-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            /* Xóa bỏ các margin-top hoặc padding thừa đẩy lệch vùng bấm */
+            margin: 5px; 
+            padding: 10px;
+        }
+
+        /* Đảm bảo chữ nằm gọn gàng, không bị tràn dòng hay đẩy lệch vùng click */
+        .lantern-option-item span, .option-label {
+            pointer-events: none; /* Giúp sự kiện click xuyên qua chữ dính thẳng vào thẻ cha hoặc nút bấm */
+            text-align: center;
+            margin-top: 5px;
+        }
+        /* Styling chung cho Trạm Phú Quốc */
+        .game-container {
+        max-width: 800px;
+        margin: 20px auto;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #fff;
+        }
+
+        .game-screen {
+            background: rgba(20, 30, 48, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(4px);
+        }
+
+        .game-screen.hidden {
+            display: none !important;
+        }
+
+        .screen-header h2 {
+            color: #00d2ff;
+            margin-top: 0;
+        }
+
+        .story-text {
+            color: #dcdde1;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .puzzle-box {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .puzzle-box input {
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #485460;
+            background: #1e272e;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            flex: 1;
+        }
+
+        .btn-game {
+            padding: 10px 20px;
+            background: #00d2ff;
+            border: none;
+            border-radius: 6px;
+            color: #0f172a;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-game:hover {
+            background: #38ef7d;
+            transform: translateY(-2px);
+        }
+
+        /* Nền Cano tự dựng bằng CSS SVG */
+        .cano-scene {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            margin-top: 15px;
+            border-radius: 10px;
+            background: linear-gradient(to bottom, #111e38 0%, #1a365d 60%, #0d253f 100%);
+            border: 2px solid #00d2ff;
+            overflow: hidden;
+        }
+
+        /* Vùng tương tác trên biển */
+        .interactive-area {
+            position: absolute;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .interactive-area:hover {
+            border-color: #38ef7d;
+            background: rgba(56, 239, 125, 0.2);
+        }
+
+        .area-fire {
+            top: 25%;
+            left: 15%;
+            width: 30%;
+            height: 50%;
+            background: rgba(235, 77, 75, 0.25);
+        }
+
+        .area-propeller {
+            top: 25%;
+            right: 15%;
+            width: 30%;
+            height: 50%;
+            background: rgba(9, 132, 227, 0.25);
+        }
+
+        .area-label {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            pointer-events: none;
+        }
+
+        /* Modal Popup */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .modal-card {
+            background: #1e272e;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 400px;
+            border: 2px solid #38ef7d;
+        }
+
+        .code-badge {
+            font-size: 1.4rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #38ef7d;
+            background: rgba(56, 239, 125, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .status-msg {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        /* 🔑 BẢNG GIẢI MÃ THƯ TỊCH CỔ (MẬT MÃ TO LÊN, KHUNG NHỎ LAI) */
+        #scroll-detail-screen {
+            padding: 10px !important;
+            justify-content: center !important;
+        }
+
+        #scroll-detail-screen > div:first-child {
+            max-height: 58vh !important; /* Tăng chiều cao vùng chứa ảnh */
+            margin-bottom: 10px !important;
+        }
+
+        #scroll-detail-screen img[src="10.mat_thu_co.png"] {
+            max-width: 95% !important; /* Phóng to ảnh mật mã */
+            max-height: 58vh !important;
+            object-fit: contain !important;
+        }
+
+        /* Thu nhỏ khung nhập liệu & căn giữa gãy gọn */
+        #scroll-detail-screen .ancient-wooden-board {
+            max-width: 650px !important; /* Thu nhỏ chiều rộng khung */
+            padding: 12px 25px !important; /* Giảm padding gọn gàng */
+            gap: 4px !important;
+        }
+
+        #scroll-detail-screen .ancient-wooden-board span {
+            font-size: min(18px, 3.8vw) !important;
+        }
+
+        #scroll-detail-screen .ancient-wooden-board p {
+            font-size: min(12px, 2.8vw) !important;
+            margin-bottom: 4px !important;
+        }
+
+        #scroll-detail-screen #scroll-key-input {
+            height: 38px !important;
+            font-size: 13px !important;
+        }
+
+        #scroll-detail-screen #btn-submit-scroll-key {
+            height: 38px !important;
+            font-size: 13px !important;
+            padding: 0 20px !important;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="orientation-warning">
+        <div class="phone-icon"></div>
+        <div style="font-size: 18px; margin-bottom: 10px; letter-spacing: 1px;">VUI LÒNG XOAY NGANG ĐIỆN THOẠI</div>
+        <div style="font-size: 13px; opacity: 0.9;">Để bước vào trường thi một cách tốt nhất!</div>
+    </div>
+
+    <div id="game-container">
+        <button id="btn-global-skip" class="btn-nav-skip">Bỏ Qua ⏭</button>
+        <button id="btn-global-back" class="btn-nav-back">⬅ Quay Lại</button>
+
+        <!-- CHẶNG HÀ NỘI -->
+        <video id="video-welcome" class="video-screen" playsinline webkit-playsinline preload="auto"><source src="welcome.mp4" type="video/mp4"></video>
+        <video id="video-travel" class="video-screen" playsinline webkit-playsinline preload="auto"><source src="capydi.mp4" type="video/mp4"></video>
+        <video id="video-exam" class="video-screen" playsinline webkit-playsinline preload="auto"><source src="capyvao.mp4" type="video/mp4"></video>
+        <video id="video-get-prompt" class="video-screen" playsinline webkit-playsinline preload="auto"><source src="capythi.mp4" type="video/mp4"></video>
+        <video id="video-king" class="video-screen" playsinline webkit-playsinline preload="auto"><source src="vuagiao.mp4" type="video/mp4"></video>
+
+        <!-- CHẶNG HUẾ -->
+        <video id="video-hue-1" class="video-screen" playsinline webkit-playsinline preload="auto"><source src="1.Capy_dap_xuong_Hue.mp4" type="video/mp4"></video>
+        <video id="video-hue-2" class="video-screen" playsinline webkit-playsinline preload="auto"><source src="2.Capy_ghe_tham_Duyet_Thi_Duong.mp4" type="video/mp4"></video>
+        <video id="video-hue-nhanhac" class="video-screen" playsinline preload="auto"><source src="5.Video_Nha_nhac_cung_dinh.mp4" type="video/mp4"></video>
+        
+        <!-- 🏮 CHẶNG HỘI AN (VIDEO MỞ ĐẦU) -->
+        <video id="video-hoian-1" class="video-screen" playsinline webkit-playsinline preload="auto"><source src="1_MO_DAU_Hoi_An.mp4" type="video/mp4"></video>
+
+        <audio id="audio-morse-decree" preload="auto"><source src="docchiu.mp3" type="audio/mpeg"></audio>
+
+        <!-- MÀN HÌNH CHỜ BAN ĐẦU -->
+        <div id="start-overlay">
+            <div id="start-overlay-bg"></div>
+            <button id="btn-start-game">Bắt Đầu Thám Hiểm 🧭</button>
+        </div>
+
+        <div id="capy-speech-bubble" class="ancient-parchment">
+            <strong>Capy:</strong> "Chào mừng các nhà thám hiểm nhí! Mình là Capy. Hôm nay, chúng ta sẽ cùng lên chiếc 'Phi thuyền Thốt nốt' để thực hiện một chuyến du lịch vô tiền khoáng hậu: Xuyên không qua các vùng đất tuyệt đẹp của Việt Nam từ quá khứ đến hiện tại! Sẵn sàng chưa? Xuất phát nào!"
+        </div>
+
+        <div id="intro-screen">
+            <div class="intro-card ancient-parchment">
+                <div class="intro-title">Sắc Chỉ Khoa Cử Triều Đình</div>
+                <div class="intro-content">
+                    <p>Kỳ thi này tìm kiếm những tài năng có kiến thức thực tế, hiểu biết sâu rộng về xã hội và khoa học để giúp dân trị thủy, canh tân đất nước.</p>
+                    <p>Để đỗ được danh hiệu <strong>Thái học sinh</strong> và bước vào cung yết kiến Quan gia, hãy sẵn sàng vượt qua thử thách!</p>
+                </div>
+                <button id="btn-start-quiz">Bước Vào Trường Thi 🖋️</button>
+            </div>
+        </div>
+
+        <div id="quiz-screen">
+            <div id="quiz-wrapper">
+                <div id="quiz-progress">Khoa thi: Câu 1/5</div>
+                <div id="question-box">Nội dung câu hỏi khoa cử...</div>
+                <div id="options-container"></div>
+                <div id="quiz-rule-note">LÀM ĐÚNG 3/5 CÂU SẼ ĐỖ THÁI HỌC SINH</div>
+            </div>
+        </div>
+
+        <div id="popup-pass" class="result-overlay">
+            <div class="royal-vertical-scroll">
+                <div class="scroll-header">Chủ Khảo Truyền Ngôn</div>
+                <div class="scroll-body">
+                    "Sĩ tử anh tài xuất chúng vượt qua kỳ thi Hội, đáp trọn đề bài, triều đình sắc phong bảng vàng!"
+                </div>
+                <div class="scroll-gold-board">
+                    <span class="scroll-gold-title">THÁI HỌC SINH</span>
+                    <span class="scroll-gold-name" id="gold-board-name">CAPY</span>
+                </div>
+                <button id="btn-pass-continue" class="btn-scroll-action scroll-pass-btn">Tiến Vào Điện Kính Thiên</button>
+            </div>
+        </div>
+
+        <div id="popup-fail" class="result-overlay">
+            <div class="royal-vertical-scroll" style="background:#e0d5bd;">
+                <div class="scroll-header" style="color:#4a3b32; border-color:#4a3b32;">Khảo Thí Bất Thành</div>
+                <div class="scroll-body" style="margin-top:20px; flex-grow:1;">
+                    <strong>Sĩ tử ngã ngửa ra sàn lều thở dài kêu:</strong><br><br>
+                    "Úi chà chà! Điểm tích lũy chưa đủ để ghi danh lên bảng vàng triều đình rồi. Chúng mình cùng mài mực ôn tập luyện tài lại nha!"
+                </div>
+                <button id="btn-fail-restart" class="btn-scroll-action scroll-fail-btn">Mài Mực Thi Lại 🖋️</button>
+            </div>
+        </div>
+
+        <div id="morse-screen">
+            <div class="morse-panel ancient-parchment">
+                <div class="morse-instruction">Quy ước trống múa lân: Tiếng CẮC = Chấm (.) | Tiếng TÙNG = Gạch (-)</div>
+                <div id="morse-dialogue-text" class="morse-dialogue">
+                    Nhấp nút phát trống bên dưới và lắng nghe cẩn thận từng nhịp đập để điền lời giải đáp dâng lên Quan gia!
+                </div>
+
+                <div id="morse-decoder-zone" class="morse-input-container">
+                    <button id="btn-play-morse" class="btn-morse btn-morse-play">🔊 Nghe Hồi Trống Trận</button>
+                    <input type="text" id="morse-user-input" class="morse-input-box" placeholder="Nhập câu hỏi giải mã viết hoa có dấu chính xác...">
+                    <button id="btn-submit-morse" class="btn-morse btn-morse-submit">Gửi Quan gia</button>
+                </div>
+
+                <div id="policy-container">
+                    <button class="btn-policy-option" onclick="checkPolicyAnswer('A')">A. KHUYẾN NÔNG SỨ</button>
+                    <button class="btn-policy-option" onclick="checkPolicyAnswer('B')">B. HÀ ĐÊ SỨ</button>
+                    <button class="btn-policy-option" onclick="checkPolicyAnswer('C')">C. ĐỒN ĐIỀN SỨ</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="morse-decree-screen">
+            <div id="morse-decree-wrapper">
+                <img src="hinh_doc_chieu.jpg" class="hue-bg-image" alt="Hình đọc chiếu thư">
+                <button id="btn-morse-decree-skip" class="btn-nav-skip" style="display: block; position: absolute; top: 15px; right: 15px;">Bỏ Qua ⏭</button>
+                <div class="morse-wooden-bubble ancient-wooden-board">
+                    <span style="font-size: min(22px, 4.5vw); color: #ffeb3b; display: block; font-family: 'Charm', cursive, serif; letter-spacing: 2px; padding: 5px 10px;">
+                        📜 SẮC PHONG TRẠNG NGUYÊN : CAPY
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div id="morse-victory-screen">
+            <div id="morse-victory-wrapper">
+                <img src="anh_cuoi.png" class="hue-bg-image" alt="Vinh quy bái tổ Trạng Nguyên">
+                <div class="morse-wooden-bubble ancient-wooden-board" style="position: absolute; bottom: 4%; left: 50%; transform: translateX(-50%); width: 92%; max-width: 950px; padding: 15px 40px; display: flex; flex-direction: column; gap: 12px; align-items: center;">
+                    <span style="font-size: min(15px, 3.2vw); font-weight: normal; line-height: 1.45; text-align: justify; display: block;">
+                        Vượt trạm thành công! Nhờ sự thông minh và khả năng vận dụng mật mã Morse xuất sắc của các bạn mà tụi mình đã đỗ Trạng Nguyên, hoàn thành trọn vẹn khoa thi Đông A vinh quang! Cỗ máy thời gian của mình đã hút đủ năng lượng và tạo ra mã khóa rồi. Các bạn mau lấy bút mực, chép ngay mã khóa <strong>HANOI1010</strong> này vào ô xác thực trong Sổ tay giấy để tàu nạp nhiên liệu bay tiếp nha!
+                    </span>
+                    <button id="btn-go-to-key-page" class="btn-hue-next-step" style="margin-top:0; padding: 6px 25px;">Tiếp Tục Để Nhập Mã Khóa 🔑</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="morse-key-auth-screen" style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 48; display: none; background: linear-gradient(135deg, #1c1008, #3d2514); justify-content: center; align-items: center;">
+            <div class="ancient-wooden-board" style="width: 85%; max-width: 550px; padding: 30px; text-align: center; display: flex; flex-direction: column; gap: 20px; align-items: center; box-shadow: 0 20px 50px rgba(0,0,0,0.9);">
+                <span style="font-size: min(20px, 4.5vw); color: #ffeb3b; font-family: 'Charm', cursive, serif; letter-spacing: 1px;">
+                    🔑 CỔ MÁY THỜI GIAN XÁC THỰC
+                </span>
+                <p style="font-size: min(14px, 3vw); color: #f7dfb3; font-weight: normal; line-height: 1.4;">
+                    Vui lòng nhập chính xác mã khóa nhận được từ Trạng Nguyên Capy để kích hoạt hệ thống nạp nhiên liệu cho Phi thuyền.
+                </p>
+                <div style="display: flex; gap: 10px; width: 100%; justify-content: center;">
+                    <input type="text" id="verification-key-input" placeholder="NHẬP MÃ KHÓA XÁC THỰC" style="padding: 10px 15px; font-size: 16px; border: 2px solid #d4af37; border-radius: 4px; background: #1a0f08; color: #fff; text-transform: uppercase; text-align: center; outline: none; width: 65%;">
+                    <button id="btn-submit-verification-key" class="btn-hue-next-step" style="margin-top:0; padding: 10px 20px;">XÁC THỰC 🚀</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="energy-loading-screen">
+            <div class="energy-title">⚡ ĐANG NẠP NĂNG LƯỢNG PHI THUYỀN THỐT NỐT ⚡</div>
+            <div class="energy-bar-container">
+                <div id="energy-bar-fill" class="energy-bar-fill"></div>
+            </div>
+            <div id="energy-status" class="energy-status-text">Đang kết nối lò phản ứng lúa nước... 0%</div>
+            
+            <div id="energy-route-box" class="energy-route-box">
+                🚀 <strong>HỆ THỐNG ĐÃ KÍCH HOẠT THÀNH CÔNG!</strong><br><br>
+                Chúc mừng bạn đã xuất sắc vượt qua các thử thách khoa cử chặng 1!<br>
+                Năng lượng đã được nạp đầy, hãy chuẩn bị nhận phần thưởng xứng đáng.
+                <br><br>
+                <button id="btn-energy-continue" class="btn-energy-continue">Nhận Huy Hiệu Danh Dự 🎖️</button>
+            </div>
+        </div>
+
+        <div id="badge-popup-overlay">
+            <div class="badge-image-container">
+                <img id="badge-display-img" src="HA_NOI_2.jpg?v=1.0" alt="Thẻ Huy Hiệu Hà Nội" onload="this.style.display='block'">
+            </div>
+            <div class="badge-control-panel">
+                <button id="btn-badge-download" class="btn-badge-download">💾 Tải Huy Hiệu Về Máy</button>
+                <button id="btn-badge-close" class="btn-badge-close">Đóng & Tiếp Tục 🏯</button>
+            </div>
+        </div>
+
+        <!-- 🏯 CHẶNG HUẾ -->
+        <div id="hue-accident-screen">
+            <div id="hue-accident-wrapper">
+                <img src="3.Su_co_tai_Duyet_Thi_Duong.jpg" class="hue-bg-image" alt="Sự cố âm thanh Duyệt Thị Đường">
+                <div class="hue-wooden-bubble ancient-wooden-board">
+                    <span>Capy ghé thăm nhà hát cổ Duyệt Thị Đường. Buổi trình diễn Nhã nhạc cung đình sắp bắt đầu nhưng dàn nhạc đang gặp sự cố về âm thanh: Tiếng trống Chiến quá to át hết tiếng trầm ấm của đàn Tỳ Bà và tiếng vang của Nhị. Du khách xung quanh đang xôn xao than phiền!</span>
+                    <button id="btn-hue-accident-continue" class="btn-hue-next-step">Tiếp Tục 🐾</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="hue-mixer-screen">
+            <div id="hue-mixer-wrapper">
+                <img src="4. keo_am_luong_nhac_cu.jpg" class="hue-bg-image" alt="Bàn điều khiển âm thanh nhạc cụ">
+                
+                <div id="mixer-success-alert" class="ancient-wooden-board" style="display: none;">
+                    <span>🎉 Kéo chính xác! Âm thanh đã hài hòa. Đoạn hòa tấu Nhã nhạc cung đình Huế đang ngân vang cực kỳ êm tai, chuẩn xác. Du khách xung quanh đồng loạt vỗ tay rầm rộ đầy thích thú!</span>
+                    <button id="btn-mixer-success-next" class="btn-hue-next-step">Qua Thử Thách Tiếp Theo 👑</button>
+                </div>
+                
+                <div id="mixer-console">
+                    <div style="color: #fff; text-align: center; grid-column: span 3; margin-bottom: 10px; background: rgba(0,0,0,0.6); padding: 5px; border-radius: 5px;">
+                        🎼 Hãy điều chỉnh âm lượng các nhạc cụ theo đúng tỷ lệ vàng: <strong>53 - 75 - 39</strong> để hòa tấu!
+                    </div>
+
+                    <div class="mixer-track">
+                        <label>🥁 TRỐNG CHIẾN<br><span style="color: #ffeb3b; font-size: 12px;">(Kéo đến: 53%)</span></label>
+                        <input type="range" id="slider-drum" class="slider-vertical" min="0" max="100" value="50">
+                        <div class="slider-target-box" id="label-drum">Âm lượng: 50%</div>
+                    </div>
+                    <div class="mixer-track">
+                        <label>🪕 ĐÀN TỲ BÀ<br><span style="color: #ffeb3b; font-size: 12px;">(Kéo đến: 75%)</span></label>
+                        <input type="range" id="slider-pipa" class="slider-vertical" min="0" max="100" value="50">
+                        <div class="slider-target-box" id="label-pipa">Âm lượng: 50%</div>
+                    </div>
+                    <div class="mixer-track">
+                        <label>🎻 ĐÀN NHỊ & SÁO<br><span style="color: #ffeb3b; font-size: 12px;">(Kéo đến: 39%)</span></label>
+                        <input type="range" id="slider-erhu" class="slider-vertical" min="0" max="100" value="50">
+                        <div class="slider-target-box" id="label-erhu">Âm lượng: 50%</div>
+                    </div>
+
+                    <button id="btn-check-mixer" style="margin-top: 20px; padding: 10px 20px; font-size: 16px; background-color: #8b5a2b; color: white; border: 2px solid #fff; border-radius: 5px; cursor: pointer; display: block; width: 100%;">
+                        Xác Nhận Kết Quả 🎛️
+                    </button>
+                </div>
+                
+                <div id="hue-nhanhac-container" style="display: none; width: 100%; max-width: 800px; margin: 20px auto; text-align: center;">
+                    <button id="btn-skip-nhanhac" style="position: absolute; top: 20px; right: 20px; z-index: 20; padding: 10px 20px; background: rgba(0, 0, 0, 0.6); color: #fff; border: 2px solid #fff; border-radius: 5px; cursor: pointer; font-size: 14px; text-transform: uppercase;">
+                        Bỏ qua ➔
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🍲 CỬA ẢI 2 CHẶNG HUẾ: CHÈ BỘT LỌC BỌC HEO QUAY -->
+        <div id="food-stage-screen" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 40; background: #000;">
+           <img id="food-main-bg" src="6.Capy_ghe_quay_am_thuc.png" style="width: 100%; height: 100%; object-fit: contain; background: black;">
+
+            <div class="ancient-wooden-board">
+                <strong>Capy đến một gian hàng ẩm thực dân gian. Thử thách tiếp theo để lấy manh mối là phải hoàn thành món chè độc lạ nhất xứ Huế: <b>Chè bột lọc bọc heo quay.</b> Trên bàn bếp đang ngổn ngang các khay nguyên liệu. Học sinh phải click vào các nguyên liệu theo đúng thứ tự chế biến chuẩn.</strong>
+            </div>
+
+            <div id="intro-food" style="position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 999;">
+                <button id="btn-start-food">Bắt đầu nấu ăn</button>
+            </div>
+
+            <div id="food-step1" class="game-screen" style="display: none;">
+                <img src="B1.jpg" class="food-image" alt="Bước 1">
+                <div id="click-pork" class="click-area" style="left: 43%; top: 23%; width: 18%; height: 18%;"></div>
+            </div>
+
+            <div id="food-step2" class="game-screen" style="display: none; position: relative; width:100%; height:100%;">
+                <img src="B2.jpg" class="food-image" style="width:100%; height:100%; object-fit:contain;" alt="Bước 2">
+                <div id="click-meat-plate-2" class="click-area" style="position:absolute; left: 38%; top: 35%; width: 24%; height: 22%; cursor:pointer; z-index:99999; border-radius:50%;"></div>
+            </div>
+
+            <div id="food-step3" class="game-screen" style="display: none;">
+                <img src="B3.jpg" class="food-image" alt="Bước 3">
+                <div id="click-knife-3" class="click-area" style="left: 68%; top: 24%; width: 12%; height: 27%;"></div>
+            </div>
+
+            <div id="food-step4" class="game-screen" style="display: none;">
+                <img src="B4.jpg" class="food-image" alt="Bước 4">
+                <div id="click-stove-4" class="click-area" style="left: 11%; top: 29%; width: 27%; height: 44%;"></div>
+            </div>
+
+            <div id="food-step5" class="game-screen" style="display: none; position: relative; width: 100%; height: 100%;">
+                <img src="B5.jpg" class="food-image" style="width: 100%; height: 100%; object-fit: contain;" alt="Bước 5">
+                <div id="click-pork-5" class="click-area" style="position: absolute; left: 40%; top: 45%; width: 30%; height: 30%; cursor: pointer; z-index: 99999; border-radius: 50%;"></div>
+            </div>
+
+            <div id="food-step6" class="game-screen" style="display: none; position: relative; width:100%; height:100%;">
+                <img src="B6.jpg" class="food-image" style="width:100%; height:100%; object-fit:contain;" alt="Bước 6">
+                <div id="timer-b6" style="position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%); background-color: rgba(0, 0, 0, 0.7); color: #fff; font-size: 24px; font-weight: bold; padding: 10px 20px; border-radius: 12px; border: 2px solid #f0b27a; z-index: 99999; text-align: center;">
+                    Đang ướp thịt... <span id="countdown-text-b6">5</span>s
+                </div>
+            </div>
+
+            <div id="food-step7" class="game-screen" style="display: none; position: relative; width: 100%; height: 100%;">
+                <img src="B7.jpg" class="food-image" style="width: 100%; height: 100%; object-fit: contain; pointer-events: none;" alt="Bước 7">
+                <div id="click-pan-7" class="click-area" style="position: absolute; left: 70%; top: 35%; width: 35%; height: 40%; cursor: pointer; z-index: 99999;"></div>
+            </div>
+
+            <div id="food-step8" class="game-screen" style="display: none;">
+                <img src="B8.jpg" class="food-image" alt="Bước 8">
+                <div id="click-pork-sieve-8" class="click-area" style="left: 36%; top: 29%; width: 32%; height: 49%;"></div>
+            </div>
+
+            <div id="food-step9" class="game-screen" style="display: none;">
+                <img src="B9.jpg" class="food-image" alt="Bước 9">
+                <div id="click-sugar-jar-9" class="click-area" style="left: 74%; top: 32%; width: 15%; height: 35%;"></div>
+            </div>
+
+            <div id="food-step10" class="game-screen" style="display: none; position: relative; width: 100%; height: 100%;">
+                <img src="B10.jpg" class="food-image" style="width: 100%; height: 100%; object-fit: contain;" alt="Bước 10">
+                <button id="btn-next-text-10" style="position: absolute; left: 50%; bottom: 12%; transform: translateX(-50%); font-size: min(22px, 4vw); font-family: Arial, sans-serif; font-weight: bold; color: #ffffff; background: #a04000; border: 3px solid #f0b27a; border-radius: 10px; padding: 12px 35px; cursor: pointer; z-index: 99999; box-shadow: 0 6px 12px rgba(0,0,0,0.5); text-transform: uppercase;">
+                    TIẾP THEO
+                </button>
+            </div>
+
+            <div id="food-step11" class="game-screen" style="display: none; position: relative; width: 100%; height: 100%;">
+                <img src="B11.jpg" class="food-image" style="width: 100%; height: 100%; object-fit: contain;" alt="Bước 11">
+                <button id="btn-next-palace-11" style="position: absolute; left: 50%; bottom: 12%; transform: translateX(-50%); font-size: min(22px, 4vw); font-family: Arial, sans-serif; font-weight: bold; color: #ffffff; background: #a04000; border: 3px solid #f0b27a; border-radius: 10px; padding: 12px 35px; cursor: pointer; z-index: 99999; box-shadow: 0 6px 12px rgba(0,0,0,0.5); text-transform: uppercase;">
+                    TIẾP THEO
+                </button>
+            </div>
+
+            <div id="food-step12" class="game-screen" style="display: none; position: relative; width: 100%; height: 100%;">
+                <img src="B12.jpg" class="food-image" style="width: 100%; height: 100%; object-fit: contain;" alt="Bước 12">
+                <div id="click-flour-bowl-12" class="click-area" style="position: absolute; left: 44%; top: 22%; width: 18%; height: 22%; cursor: pointer; z-index: 99999; border-radius:8px;"></div>
+            </div>
+
+            <div id="food-step13" class="game-screen" style="display: none; position: relative; width: 100%; height: 100%;">
+                <img src="B13.jpg" class="food-image" style="width: 100%; height: 100%; object-fit: contain;" alt="Bước 13">
+                <div id="click-sugar-jar-13" class="click-area" style="position: absolute; left: 69%; top: 69%; width: 14%; height: 22%; cursor: pointer; z-index:99999; border-radius:8px;"></div>
+                <div id="click-salt-jar-13" class="click-area" style="position: absolute; left: 69%; top: 48%; width: 14%; height: 22%; cursor: pointer; z-index:99999; border-radius:8px;"></div>
+            </div>
+
+            <div id="food-step14" class="game-screen" style="display: none; position: relative; width: 100%; height: 100%;">
+                <img src="B14.jpg" class="food-image" style="width: 100%; height: 100%; object-fit: contain;" alt="Bước 14">
+                <div id="click-oil-bottle-14" class="click-area" style="position: absolute; left: 70%; top: 28%; width: 14%; height: 24%; cursor: pointer; z-index:99999; border-radius:8px;"></div>
+            </div>
+
+            <div id="food-step15" class="game-screen" style="display: none; position: relative; width: 100%; height: 100%;">
+                <img src="B15.jpg" class="food-image" style="width: 100%; height: 100%; object-fit: contain;" alt="Bước 15">
+                <div id="click-stove-15" class="click-area" style="position:absolute; left:13%; top:22%; width:26%; height:50%; cursor:pointer; z-index:99999; border-radius:8px;"></div>
+            </div>
+
+            <div id="food-step16" class="game-screen" style="display: none; position: relative; width: 100%; height: 100%;">
+                <img src="B16.jpg" class="food-image" style="width:100%; height:100%; object-fit:contain;" alt="Bước 16">
+                <div id="click-dough-bowl-16" class="click-area" style="position:absolute; left:54%; top:20%; width:24%; height:43%; cursor:pointer; z-index:99999; border-radius:8px;"></div>
+            </div>
+
+            <div id="food-step17" class="game-screen" style="display: none; position: relative; width: 100%; height: 100%;">
+                <img src="B17.jpg" class="food-image" style="width:100%; height:100%; object-fit:contain;" alt="Bước 17">
+                <div id="click-dough-bowl-17" class="click-area" style="position:absolute; left:54%; top:20%; width:24%; height:43%; cursor:pointer; z-index:99999; border-radius:8px;"></div>
+            </div>
+
+            <div id="food-step18" class="game-screen" style="display: none; position: relative; width: 100%; height: 100%;">
+                <img src="B18.jpg" class="food-image" style="width:100%; height:100%; object-fit:contain;" alt="Bước 18">
+                <div id="click-cutter-18" class="click-area" style="position: absolute; left: 79%; top: 38%; width: 9.5%; height: 24%; cursor: pointer; z-index: 99999; border-radius: 8px;"></div>
+            </div>
+
+            <div id="food-step19" class="game-screen" style="display: none; position: relative; width: 100%; height: 100%;">
+                <img src="B19.jpg" class="food-image" style="width:100%; height:100%; object-fit:contain;" alt="Bước 19">
+                <div id="click-cut-dough-19" class="click-area" style="position:absolute; left:67%; top:47%; width:12%; height:18%; cursor:pointer; z-index:99999; border-radius:8px;"></div>
+            </div>
+
+            <div id="food-step20" class="game-screen" style="display: none; position: relative; width: 100%; height: 100%;">
+                <img src="B20.jpg" class="food-image" style="width:100%; height:100%; object-fit:contain;" alt="Bước 20">
+                <div id="click-meat-20" class="click-area" style="position:absolute; left:78%; top:29%; width:17%; height:38%; cursor:pointer; z-index:99999; border-radius:8px;"></div>
+            </div>
+
+            <div id="food-step21" class="game-screen" style="display: none; position: relative; width:100%; height:100%;">
+                <img src="B21.jpg" class="food-image" style="width:100%; height:100%; object-fit:contain;" alt="Bước 21">
+                <button id="btn-next-21" style="position: absolute; left: 50%; bottom: 15%; transform: translateX(-50%); font-size: min(20px, 4vw); font-family: Arial, sans-serif; font-weight: bold; color: #ffffff; background: #a04000; border: 3px solid #f0b27a; border-radius: 10px; padding: 10px 30px; cursor: pointer; z-index: 99999; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">
+                    TIẾP THEO
+                </button>
+            </div>
+
+            <div id="food-step22" class="game-screen" style="display: none; position: relative; width:100%; height:100%;">
+                <img src="B22.jpg" class="food-image" style="width:100%; height:100%; object-fit:contain;" alt="Bước 22">
+                <div id="click-stove-22" class="click-area" style="position:absolute; left:13%; top:22%; width:26%; height:50%; cursor:pointer; z-index:99999; border-radius:8px;"></div>
+            </div>
+
+            <div id="food-step23" class="game-screen" style="display: none; position: relative; width:100%; height:100%;">
+                <img src="B23.jpg" class="food-image" style="width:100%; height:100%; object-fit:contain;" alt="Bước 23">
+                <div id="click-che-balls-23" class="click-area" style="position:absolute; left:47%; top:31%; width:20%; height:26%; cursor:pointer; z-index:99999; border-radius:8px;"></div>
+            </div>
+
+            <div id="food-step24" class="game-screen" style="display: none; position: relative; width:100%; height:100%;">
+                <img src="B24.jpg" class="food-image" style="width:100%; height:100%; object-fit:contain;" alt="Bước 24">
+                <div id="click-va-24" class="click-area" style="position:absolute; left: 72%; top: 48%; width: 10%; height: 25%; cursor:pointer; z-index:99999; border-radius:8px;"></div>
+            </div>
+
+            <div id="food-step25" class="game-screen" style="display: none; position: relative; width:100%; height:100%;">
+                <img src="B25.jpg" class="food-image" style="width:100%; height:100%; object-fit:contain;" alt="Bước 25">
+                <button id="btn-next-25" style="position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%); font-size: min(20px, 4vw); font-family: Arial, sans-serif; font-weight: bold; color: #ffffff; background: #a04000; border: 3px solid #f0b27a; border-radius: 10px; padding: 10px 30px; cursor: pointer; z-index: 99999; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">
+                    TIẾP THEO
+                </button>
+            </div>
+
+            <div id="food-step26" class="game-screen" style="display: none; position: relative; width:100%; height:100%;">
+                <img src="B26.jpg" class="food-image" style="width:100%; height:100%; object-fit:contain;" alt="Bước 26">
+                <div id="click-ginger-26" class="click-area" style="position:absolute; left: 77%; top: 60%; width: 12%; height: 14%; cursor:pointer; z-index:99999; border-radius:8px;"></div>
+            </div>
+
+            <div id="food-step27" class="game-screen" style="display: none; position: relative; width:100%; height:100%;">
+                <img src="B27.jpg" class="food-image" style="width:100%; height:100%; object-fit:contain;" alt="Bước 27">
+                <div id="click-knife-27" class="click-area" style="position:absolute; left: 68%; top: 38%; width: 16%; height: 10%; cursor:pointer; z-index:99999; border-radius:8px;"></div>
+            </div>
+
+            <div id="food-step28" class="game-screen" style="display: none; position: relative; width:100%; height:100%;">
+                <img src="B28.jpg" class="food-image" style="width:100%; height:100%; object-fit:contain;" alt="Bước 28">
+                <div id="click-stove-28" class="click-area" style="position:absolute; left:13%; top:22%; width:26%; height:50%; cursor:pointer; z-index:99999; border-radius:8px;"></div>
+            </div>
+
+            <div id="food-step29" class="game-screen" style="display: none; position: relative; width:100%; height:100%;">
+                <img src="B29.jpg" class="food-image" style="width:100%; height:100%; object-fit:contain;" alt="Bước 29">
+                <div id="click-sugar-29" class="click-area" style="position:absolute; left: 70%; top: 50%; width: 12%; height: 12%; cursor:pointer; z-index:99999; border-radius:8px;"></div>
+            </div>
+
+            <div id="food-step30" class="game-screen" style="display: none; position: relative; width:100%; height:100%;">
+                <img src="B30.jpg" class="food-image" style="width:100%; height:100%; object-fit:contain;" alt="Bước 30">
+                <div id="click-che-bowl-30" class="click-area" style="position:absolute; left: 72%; top: 45%; width: 16%; height: 16%; cursor:pointer; z-index:99999; border-radius:50%;"></div>
+            </div>
+
+            <div id="food-step31" class="game-screen" style="display: none; position: relative; width:100%; height:100%;">
+                <img src="B31.jpg" class="food-image" style="width:100%; height:100%; object-fit:contain;" alt="Bước 31">
+                <div id="timer-b31" style="position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%); background-color: rgba(0, 0, 0, 0.7); color: #fff; font-size: 24px; font-weight: bold; padding: 10px 20px; border-radius: 12px; border: 2px solid #f0b27a; z-index: 99999; text-align: center;">
+                    Đang nấu... <span id="countdown-text">5</span>s
+                </div>
+            </div>
+
+            <div id="food-step32" class="game-screen" style="display: none; position: relative; width: 100%; height: 100%;">
+                <img src="B32.jpg" class="food-image" style="width: 100%; height: 100%; object-fit: contain;" alt="Bước 32">
+                <button id="btn-finish-food-32" style="position: absolute; left: 50%; bottom: 12%; transform: translateX(-50%); font-size: min(22px, 4vw); font-family: Arial, sans-serif; font-weight: bold; color: #ffffff; background: #a04000; border: 3px solid #f0b27a; border-radius: 10px; padding: 12px 35px; cursor: pointer; z-index: 99999; box-shadow: 0 6px 12px rgba(0,0,0,0.5);">
+                    HOÀN THÀNH
+                </button>
+            </div>
+
+            <div id="food-step33-finish" class="game-screen" style="display: none; position: relative; width: 100%; height: 100%;">
+                <img src="8.Capy_thuong_thuc_che.png" class="food-image" style="width: 100%; height: 100%; object-fit: contain;" alt="Capy thưởng thức chè">
+                <button id="btn-final-finish" style="position: absolute; left: 50%; bottom: 12%; transform: translateX(-50%); font-size: min(20px, 4vw); font-family: Arial, sans-serif; font-weight: bold; color: #ffffff; background: #a04000; border: 3px solid #f0b27a; border-radius: 10px; padding: 12px 35px; cursor: pointer; z-index: 99999; box-shadow: 0 6px 12px rgba(0,0,0,0.5); text-transform: uppercase;">
+                    XEM MANH MỐI CUỐI
+                </button>
+            </div>
+            
+            <!-- GIẢI MÃ CUỘN GIẤY DA CỔ -->
+            <div id="scroll-intro-screen" style="position: relative; width: 100%; height: 100%; display: none; align-items: center; justify-content: center;">
+                <img src="9.Capy_duoc_tang_giay_da.png" alt="Capy được tặng giấy da" style="width: 100%; height: 100%; object-fit: cover;">
+                <div id="scroll-intro-chat" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: rgba(255, 255, 255, 0.95); border: 2px solid #5c3d2e; border-radius: 15px; padding: 10px 18px; width: auto; max-width: 80%; box-shadow: 0 4px 10px rgba(0,0,0,0.25); z-index: 10; font-family: Arial, sans-serif; font-size: 14px; color: #333; line-height: 1.4; text-align: center;">
+                    <span id="scroll-intro-text">Đang tải lời thoại...</span>
+                    <button id="btn-next-scroll-intro" style="display: block; margin: 6px auto 0 auto; background: #8b5a2b; color: #fff; border: none; padding: 4px 10px; font-size: 11px; border-radius: 5px; cursor: pointer;">Tiếp tục ➔</button>
+                </div>
+            </div>
+                
+            <div id="scroll-detail-screen" class="game-screen" style="display: none; width: 100vw; height: 100vh; background: #26140a; flex-direction: column; justify-content: flex-start; align-items: center; overflow-y: auto; padding: 15px 10px; box-sizing: border-box;">
+                <div style="width: 100%; max-height: 46vh; display: flex; justify-content: center; align-items: center; margin-bottom: 20px; flex-shrink: 0;">
+                    <img src="10.mat_thu_co.png" style="max-width: 80%; max-height: 46vh; object-fit: contain; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.5);" alt="Mật thư cổ">
+                </div>
+
+                <div class="ancient-wooden-board" style="width: 96%; max-width: 1200px; padding: 22px 50px; text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center; box-shadow: 0 15px 35px rgba(0,0,0,0.7); border: 2px solid #d4af37; background: #4a2f1b; border-radius: 8px; box-sizing: border-box; flex-shrink: 0; position: relative;">
+                    <span style="font-size: 20px; color: #ffeb3b; font-family: 'Charm', cursive, serif; letter-spacing: 1.5px; font-weight: bold;">
+                        🔑 GIẢI MÃ THƯ TỊCH CỔ
+                    </span>
+                    <p style="font-size: 14px; color: #f7dfb3; font-weight: normal; line-height: 1.4; margin: 0 0 6px 0;">
+                        Nhập vùng đất lịch sử được giải mã từ mật thư Semaphore phía trên.
+                    </p>
+                    
+                    <div style="display: flex; gap: 15px; width: 100%; justify-content: center; align-items: center; flex-wrap: nowrap;">
+                        <input type="text" id="scroll-key-input" placeholder="NHẬP ĐÁP ÁN TẠI ĐÂY" style="padding: 10px 15px; font-size: 15px; border: 2px solid #d4af37; border-radius: 4px; background: #1a0f08; color: #fff; text-transform: uppercase; text-align: center; outline: none; width: 80%; height: 45px; box-sizing: border-box;">
+                        <button id="btn-submit-scroll-key" style="padding: 0 35px; font-size: 14px; color: #fff; background: linear-gradient(to bottom, #d4af37, #aa820a); border: 2px solid #ffe6c4; border-radius: 4px; cursor: pointer; height: 45px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.3); text-transform: uppercase; white-space: nowrap;">XÁC THỰC 🚀</button>
+                    </div>
+                    
+                    <div id="scroll-error-msg" style="display: none; color: #ff4d4d; font-size: 12px; margin-top: 5px; font-weight: bold;">
+                        ❌ Mật mã chưa chính xác. Hãy quan sát kỹ vị trí các lá cờ nhé!
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🎉 MÀN HÌNH CHÚC MỪNG CHẶNG HUẾ -->
+            <div id="hue-congrats-screen" class="game-screen" style="display: none; position: relative; width: 100%; height: 100%;">
+                <img src="11.Capy_hoan_thanh.png" class="food-image" style="width: 100%; height: 100%; object-fit: contain;" alt="Chúc mừng hoàn thành chặng Huế">
+                <div style="width: 100%; background: rgba(33, 18, 8, 0.96); border-top: 4px double #d4af37; padding: 18px 25px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; z-index: 100; position: absolute; bottom: 0; left: 0; box-shadow: 0 -10px 30px rgba(0,0,0,0.8);">
+                    <div style="color: #f7dfb3; font-family: 'Courier New', monospace; font-size: min(16px, 3.2vw); font-weight: bold; line-height: 1.5; text-align: justify; max-width: 78%; text-shadow: 1px 1px 2px #000;">
+                        🎉 <strong style="color: #ffeb3b; font-size: min(22px, 4.2vw); display: inline-block; margin-bottom: 4px;">Thành công rồi các cậu ơi!</strong><br>
+                        Chuyến săn tìm di sản Huế hôm nay vui quá xá! Nhờ sự tinh mắt giải mã quạt Semaphore và tài chỉnh nhạc cụ cung đình cực đỉnh của các cậu mà tụi mình đã phá đảo trạm này luôn! Năng lượng đã đầy 100%, các cậu mau lấy bút mực chép ngay mã khóa <strong style="color: #00ffcc; font-size: min(18px, 3.5vw);">FESTIVALHUE</strong> này vào ô xác thực trong Sổ tay giấy để tụi mình nạp nhiên liệu, đưa phi thuyền bay tiếp đến Phố cổ Hội An nhé!!
+                    </div>
+                    <button id="btn-go-to-hue-badge" style="padding: 12px 28px; font-size: min(15px, 3vw); font-weight: bold; background: linear-gradient(to bottom, #e67e22, #d35400); color: white; border: 2px solid #ffe6c4; border-radius: 25px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.5); text-transform: uppercase; white-space: nowrap; transition: transform 0.2s;">
+                        Huy Hiệu 🎖️
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MÀN HÌNH NHẬN HUY HIỆU HUẾ -->
+        <div id="hue-badge-popup-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 999999; display: none; flex-direction: column; justify-content: center; align-items: center; background-color: #000000; padding: 20px; box-sizing: border-box;">
+            <div class="badge-image-container" style="display: flex; justify-content: center; align-items: center; width: 100%; max-height: 70vh; margin-bottom: 25px;">
+                <img id="hue-badge-display-img" src="12.Huy_hieu_Hue.png" alt="Thẻ Huy Hiệu Huế" style="max-width: 90%; max-height: 65vh; object-fit: contain; border: 3px solid #ffeb3b; border-radius: 8px; box-shadow: 0 0 30px rgba(255,235,59,0.35);">
+            </div>
+            <div class="badge-control-panel" style="width: 90%; max-width: 400px; display: flex; flex-direction: column; gap: 10px;">
+                <button id="btn-hue-badge-download" class="btn-badge-download" style="width: 100%; padding: 12px 0; font-size: 15px; background: linear-gradient(to bottom, #916611, #6e4c0a); color: #fffdf0; border: 2px solid #5e1100; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-weight: bold;">💾 Tải Huy Hiệu Về Máy</button>
+                <button id="btn-hue-badge-close" class="btn-badge-close" style="width: 100%; padding: 10px 0; font-size: 13px; background: #d4c4a3; color: #2e1700; border: 1px solid #5c4731; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-weight: bold;">Tiếp Tục Hành Trình 🚀</button>
+            </div>
+        </div>
+
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
